@@ -264,3 +264,214 @@ Symbol 字面量是编译时常量。
 
 ## 函数
 
+Dart 是一种真正面向对象的语言，所以即便函数也是对象并且类型为 [Function](https://api.dart.cn/stable/dart-core/Function-class.html)，这意味着函数可以被赋值给变量或者作为其它函数的参数。你也可以像调用函数一样调用 Dart 类的实例。详情请查阅 [可调用的类](https://dart.cn/guides/language/language-tour#callable-classes)。
+
+语法 `=> 表达式` 是 `{ return 表达式; }` 的简写， `=>` 有时也称之为 **箭头** 函数。
+
+> 在 `=>` 与 `;` 之间的只能是 *表达式* 而非 *语句*。比如你不能将一个 [if语句](https://dart.cn/guides/language/language-tour#if-and-else) 放在其中，但是可以放置 [条件表达式](https://dart.cn/guides/language/language-tour#conditional-expressions)。
+
+### 参数
+
+函数可以有两种形式的参数：**必要参数** 和 **可选参数**。必要参数定义在参数列表前面，可选参数则定义在必要参数后面。可选参数可以是 **命名的** 或 **位置的**。
+
+> 某些 API（特别是 [Flutter](https://flutter.cn/) 控件的构造器）只使用命名参数，即便参数是强制性的。
+
+向函数传入参数或者定义函数参数时，可以使用 *尾逗号*。
+
+#### 命名参数
+
+命名参数默认为可选参数，除非他们被特别标记为 `required` 。
+
+当你调用函数时，可以使用 `参数名: 参数值` 的形式来指定命名参数。
+
+定义函数时，使用 `{参数1, 参数2, …}` 来指定命名参数。
+
+虽然命名参数是可选参数的一种类型，但是你仍然可以使用 `required` 来标识一个命名参数是必须的参数，此时调用者必须为该参数提供一个值。
+
+#### 可选的位置参数
+
+使用 `[]` 将一系列参数包裹起来作为位置参数。
+
+#### 默认参数值
+
+可以用 `=` 为函数的命名参数和位置参数定义默认值，默认值必须为编译时常量，没有指定默认值的情况下默认值为 `null` 。
+
+### main() 函数
+
+每个 Dart 程序都必须有一个 `main()` 顶级函数作为程序的入口， `main()` 函数返回值为 `void` 并且有一个 `List<String>` 类型的可选参数。
+
+你可以通过使用 [参数库](https://pub.flutter-io.cn/packages/args) 来定义和解析命令行参数。
+
+可以将函数作为参数传递给另一个函数。也可以将函数赋值给一个变量。
+
+### 匿名函数
+
+你可以创建一个没有名字的方法，称之为 **匿名函数**、 **Lambda 表达式** 或 **Closure 闭包**。你可以将匿名方法赋值给一个变量然后使用它
+
+匿名方法看起来与命名方法类似，在括号之间可以定义参数，参数之间用逗号分割。
+
+后面大括号中的内容则为函数体：
+
+```dart
+([[类型] 参数[, …]]) {
+  函数体;
+}; 
+```
+
+如果函数体内只有一行返回语句，你可以使用胖箭头缩写法。
+
+### 词法作用域
+
+Dart 是词法有作用域语言，变量的作用域在写代码的时候就确定了，大括号内定义的变量只能在大括号内访问，与 Java 类似。
+
+### 词法闭包
+
+**闭包** 即一个函数对象，即使函数对象的调用在它原始作用域之外，依然能够访问在它词法作用域内的变量。
+
+函数可以封闭定义到它作用域内的变量。接下来的示例中，函数 `makeAdder()` 捕获了变量 `addBy`。无论函数在什么时候返回，它都可以使用捕获的 `addBy` 变量。
+
+```dart
+
+
+/// Returns a function that adds [addBy] to the
+/// function's argument.
+Function makeAdder(int addBy) {
+  return (int i) => addBy + i;
+}
+
+void main() {
+  // Create a function that adds 2.
+  var add2 = makeAdder(2);
+
+  // Create a function that adds 4.
+  var add4 = makeAdder(4);
+
+  assert(add2(3) == 5);
+  assert(add4(3) == 7);
+}
+```
+
+### 返回值
+
+所有的函数都有返回值。没有显示返回语句的函数最后一行默认为执行 `return null;`。
+
+## 运算符
+
+Dart 可以将运算符实现为 [一个类的成员](https://dart.cn/guides/language/language-tour#_operators)。
+
+| **描述**       | **运算符**                                  |
+| -------------- | ------------------------------------------- |
+| 一元后缀       | `表达式++ 表达式-- () [] . ?. !`            |
+| 一元前缀       | `-表达式 !表达式 ~表达式 ++表达式 --表达式` |
+| 乘除法         | `* / % ~/`                                  |
+| 加减法         | `+ -`                                       |
+| 位运算         | `<< >> >>>`                                 |
+| 二进制与       | `&`                                         |
+| 二进制异或     | `^`                                         |
+| 二进制或       | `                                           | ` |
+| 关系和类型测试 | `>= > <= < as is is!`                       |
+| 相等判断       | `== !=`                                     |
+| 逻辑与         | `&& `                                       |
+| 逻辑或         | `                                           |   | ` |
+| 空判断         | `??`                                        |
+| 条件表达式     | `表达式 1 ? 表达式 2 : 表达式 3`            |
+| 级联           | `.. ?..`                                    |
+| 赋值           | `= *= /= += -= &= ^=` 等等……                |
+
+### 类型判断运算符
+
+`as`、`is`、`is!` 运算符是在运行时判断对象类型的运算符。
+
+| **Operator** | **Meaning**                                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------------------------- |
+| `as`         | 类型转换（也用作指定 [类前缀](https://dart.cn/guides/language/language-tour#specifying-a-library-prefix))） |
+| `is`         | 如果对象是指定类型则返回 *true*                                                                             |
+| `is!`        | 如果对象是指定类型则返回 *false*                                                                            |
+
+当且仅当 `obj` 实现了 `T` 的接口，`obj is T` 才是 true。例如 `obj is Object` 总为 true，因为所有类都是 Object 的子类。
+
+仅当你确定这个对象是该类型的时候，你才可以使用 `as` 操作符可以把对象转换为特定的类型。
+
+### 条件表达式
+
+Dart 有两个特殊的运算符可以用来替代 [if-else](https://dart.cn/guides/language/language-tour#if-%E5%92%8C-else) 语句：
+
+`条件 ? 表达式 1 : 表达式 2`
+
+如果*条件*为 true，执行*表达式 1*并返回执行结果，否则执行*表达式 2* 并返回执行结果。
+
+`表达式 1 ?? 表达式 2`
+
+如果*表达式 1* 为非 null 则返回其值，否则执行*表达式 2* 并返回其值。
+
+### 级联运算符
+
+级联运算符 (`..`, `?..`) 可以让你在同一个对象上连续调用多个对象的变量或方法。
+
+```dart
+var paint = Paint()
+  ..color = Colors.black
+  ..strokeCap = StrokeCap.round
+  ..strokeWidth = 5.0;
+```
+
+`Paint()` 构造器返回一个 `Point` 对象。在对象后跟的级联符号运算符，忽略了所有可能被返回的值。上面的代码等价于：
+
+```dart
+var paint = Paint();
+paint.color = Colors.black;
+paint.strokeCap = StrokeCap.round;
+paint.strokeWidth = 5.0;
+```
+
+如果级联运算符用在了可能为null的对象上，那么使用 *null-shorting* （`?..`）在第一个操作上。以 `?..` 开头保证了任何级联运算符都是在非空对象上进行操作。
+
+```dart
+querySelector('#confirm') // Get an object.
+  ?..text = 'Confirm' // Use its members.
+  ..classes.add('important')
+  ..onClick.listen((e) => window.alert('Confirmed!'));
+```
+
+上面的代码相当于：
+
+```dart
+var button = querySelector('#confirm');
+button?.text = 'Confirm';
+button?.classes.add('important');
+button?.onClick.listen((e) => window.alert('Confirmed!'));
+```
+
+级联运算符可以嵌套。在返回对象的函数中谨慎使用级联操作符。
+
+### 其他运算符
+
+| **运算符** | **名字**      | **描述**                                                                                                        |
+| ---------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| ()         | 使用方法      | 代表调用一个方法                                                                                                |
+| []         | 访问 List     | 访问 List 中特定位置的元素                                                                                      |
+| ?[]        | 判空访问 List | 左侧调用者不为空时，访问 List 中特定位置的元素                                                                  |
+| .          | 访问成员      | 成员访问符                                                                                                      |
+| ?.         | 条件访问成员  | 与上述成员访问符类似，但是左边的操作对象不能为 null，例如 foo?.bar，如果 foo 为 null 则返回 null ，否则返回 bar |
+| !          | 空断言操作符  | 将表达式的类型转换为其基础类型，如果转换失败会抛出运行时异常。例如 foo!.bar，如果 foo 为 null，则抛出运行时异常 |
+
+## 流程控制语句
+
+
+
+- `if` 和 `else`
+- `for` 循环
+- `while` 和 `do-while` 循环
+- `break` 和 `continue`
+- `switch` 和 `case`
+- `assert`
+
+使用 `try-catch` 和 `throw` 也能影响控制流，详情参考[异常](https://dart.cn/guides/language/language-tour#exceptions)部分。
+
+### 断言
+
+在开发过程中，可以在条件表达式为 false 时使用 — `assert(条件, 可选信息);` — 语句来打断代码的执行。第二个参数可以为其添加一个字符串消息。
+
+`assert` 的第一个参数可以是值为布尔值的任何表达式。如果表达式的值为 true，则断言成功，继续执行。如果表达式的值为 false，则断言失败，抛出一个 [AssertionError](https://api.dart.cn/stable/dart-core/AssertionError-class.html) 异常。
+
+在生产环境代码中，断言会被忽略，与此同时传入 assert 的参数不被判断。
