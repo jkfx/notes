@@ -1,14 +1,23 @@
 ## 重要概念
 
 - 所有变量引用的都是**对象**，每个对象都是一个**类**的实例。数字、函数以及 `null` 都是对象。除去 `null` 以外（如果你开启了[空安全](https://dart.cn/null-safety)）, 所有的类都继承于 [Object](https://api.dart.cn/stable/dart-core/Object-class.html) 类。
+
 - 尽管 Dart 是强类型语言，但是在声明变量时指定类型是可选的，因为 Dart 可以进行类型推断。
+
 - 如果你开启了[空安全](https://dart.cn/null-safety)，变量在未声明为可空类型时不能为`null`。你可以通过在类型后加上问号 (`?`) 将类型声明为可空。例如，`int?` 类型的变量可以是整形数字或 `null`。如果你 **明确知道** 一个表达式不会为空，但 Dart 不这么认为时，你可以在表达式后添加 `!` 来断言表达式不为空（为空时将抛出异常）。例如：`int x = nullableButNotNullInt!`
+
 - 如果你想要显式地声明允许任意类型，使用 `Object?`（如果你 [开启了空安全](https://dart.cn/null-safety#enable-null-safety)）、 Object 或者 [特殊类型 dynamic](https://dart.cn/guides/language/effective-dart/design#avoid-using-dynamic-unless-you-want-to-disable-static-checking) 将检查延迟到运行时进行。
+
 - Dart 支持泛型，比如 `List<int>`（表示一组由 int 对象组成的列表）或 `List<Object>`（表示一组由任何类型对象组成的列表）。
+
 - Dart 支持顶级函数（例如 `main` 方法），同时还支持定义属于类或对象的函数（即 *静态* 和 *实例方法*）。你还可以在函数中定义函数（*嵌套* 或 *局部函数*）。
+
 - Dart 支持顶级 **变量**，以及定义属于类或对象的变量（*静态*和*实例变量*）。实例变量有时称之为域或属性。
+
 - Dart 没有类似于 Java 那样的 `public`、`protected` 和 `private` 成员访问限定符。如果一个标识符以下划线 (`_`) 开头则表示该标识符在库内是私有的。可以查阅 [库和可见性](https://dart.cn/guides/language/language-tour#libraries-and-visibility) 获取更多相关信息。
+
 - Dart 中 **表达式** 和 **语句** 是有区别的，表达式有值而语句没有。比如条件表达式 `expression condition ? expr1 : expr2` 中含有值 `expr1` 或 `expr2`。与 [if-else 分支语句](https://dart.cn/guides/language/language-tour#if-and-else)相比，`if-else` 分支语句则没有值。一个语句通常包含一个或多个表达式，但是一个表达式不能只包含一个语句。
+
 - Dart 工具可以显示 警告 和 错误 两种类型的问题。警告表明代码可能有问题但不会阻止其运行。错误分为编译时错误和运行时错误；编译时错误代码无法运行；运行时错误会在代码运行时导致 [异常](https://dart.cn/guides/language/language-tour#exceptions)。
 
 ## 变量
@@ -34,7 +43,9 @@ var name = 'Geek JKFX';
 ### Late 变量
 
 Dart 2.12 添加了 `late` 修饰符，其有如下两个使用场景：
+
 - 声明一个非空变量，其在声明之后进行初始化操作
+
 - 懒式初始化一个变量
 
 如果你确保一个变量在使用之前被赋值，而Dart的控制流分析并没有检测到，你可以通过`late`修饰一个变量修复错误提示。
@@ -51,7 +62,9 @@ void main() {
 > 如果你并没有初始化`late`变量，当变量被使用的时候会抛出运行时错误。
 
 当你使用`late`修饰变量而在声明变量时不进行初始化，那么初始化操作将在变量首次被使用的时候执行。懒式初始化有几个方便的场景：
+
 - 一个变量初始化操作非常耗时，并且不确定会被使用。
+
 - 你初始化一个实例变量，并且初始化操作需要访问`this`。
 
 ### Final 和 Const
@@ -71,24 +84,43 @@ void main() {
 ## 内置类型
 
 Dart 语言支持下列内容：
+
 - [Numbers](https://dart.cn/guides/language/language-tour#numbers) (`int`, `double`)
+
 - [Strings](https://dart.cn/guides/language/language-tour#strings) (`String`)
+
 - [Booleans](https://dart.cn/guides/language/language-tour#booleans) (`bool`)
+
 - [Lists](https://dart.cn/guides/language/language-tour#lists) (也被称为 *arrays*)
 
+---
+
 - [Sets](https://dart.cn/guides/language/language-tour#sets) (`Set`)
+
 - [Maps](https://dart.cn/guides/language/language-tour#maps) (`Map`)
+
 - [Runes](https://dart.cn/guides/language/language-tour#characters) (常用于在 `Characters` API 中进行字符替换)
 
+---
+
 - [Symbols](https://dart.cn/guides/language/language-tour#symbols) (`Symbol`)
+
 - The value null (`Null`)
 
+---
+
 一些特殊类型在Dart语言中也有着特别作用：
+
 - `Object` 所有Dart类的超类（*superclass*），除了`Null`之外。
+
 - `Future` 和 `Stream` 用在 [异步支持](https://dart.cn/guides/language/language-tour#asynchrony-support) 中。
+  
 - `Iterable` 用于 [for-in 循环](https://dart.cn/guides/libraries/library-tour#iteration) 以及*同步* [生成器函数](https://dart.cn/guides/language/language-tour#generator)。
+
 - `Never` 表明一个表达式永远不会成功地完成评估（*evaluating*）。多数情况下用于总是抛出一个异常的函数。
+
 - `dynamic` 表明你想要禁用静态检查。通常你应该使用`Object`或`Object?`代替。
+
 - `void` 表明一个永远不会被使用的值。通常用作返回类型。
 
 `Object`、`Object?`、`Null`和`Never`类在类层次（*class hierarchy*）中有着特殊作用，描述在[top-and-bottom](https://dart.cn/null-safety/understanding-null-safety#top-and-bottom)和[理解空安全](https://dart.cn/null-safety/understanding-null-safety)中。
@@ -460,11 +492,17 @@ button?.onClick.listen((e) => window.alert('Confirmed!'));
 
 
 - `if` 和 `else`
+
 - `for` 循环
+
 - `while` 和 `do-while` 循环
+
 - `break` 和 `continue`
+
 - `switch` 和 `case`
+
 - `assert`
+
 
 使用 `try-catch` 和 `throw` 也能影响控制流，详情参考[异常](https://dart.cn/guides/language/language-tour#exceptions)部分。
 
@@ -475,3 +513,256 @@ button?.onClick.listen((e) => window.alert('Confirmed!'));
 `assert` 的第一个参数可以是值为布尔值的任何表达式。如果表达式的值为 true，则断言成功，继续执行。如果表达式的值为 false，则断言失败，抛出一个 [AssertionError](https://api.dart.cn/stable/dart-core/AssertionError-class.html) 异常。
 
 在生产环境代码中，断言会被忽略，与此同时传入 assert 的参数不被判断。
+
+## 异常
+
+与 Java 不同的是，Dart 的所有异常都是非必检异常，方法不必声明会抛出哪些异常，并且你也不必捕获任何异常。
+
+Dart 提供了 [Exception](https://api.dart.cn/stable/dart-core/Exception-class.html) 和 [Error](https://api.dart.cn/stable/dart-core/Error-class.html) 两种类型的异常以及它们一系列的子类，你也可以定义自己的异常类型。但是在 Dart 中可以将任何非 null 对象作为异常抛出而不局限于 Exception 或 Error 类型。也可以抛出任意的对象。
+
+### 捕获异常
+
+捕获异常可以避免异常继续传递（重新抛出异常除外）。捕获一个异常可以给你处理它的机会。
+
+对于可以抛出多种异常类型的代码，也可以指定多个 catch 语句，每个语句分别对应一个异常类型，如果 catch 语句没有指定异常类型则表示可以捕获任意异常类型：
+
+```dart
+try {
+  breedMoreLlamas();
+} on OutOfLlamasException {
+  // A specific exception
+  buyMoreLlamas();
+} on Exception catch (e) {
+  // Anything else that is an exception
+  print('Unknown exception: $e');
+} catch (e) {
+  // No specified type, handles all
+  print('Something really unknown: $e');
+}
+```
+
+如上述代码所示可以使用 `on` 或 `catch` 来捕获异常，使用 `on` 来指定异常类型，使用 `catch` 来捕获异常对象，两者可同时使用。
+
+你可以为 catch 方法指定两个参数，第一个参数为抛出的异常对象，第二个参数为栈信息 [StackTrace](https://api.dart.cn/stable/dart-core/StackTrace-class.html) 对象。
+
+关键字 `rethrow` 可以将捕获的异常再次抛出。
+
+### Finally
+
+无论是否抛出异常，`finally` 语句始终执行，如果没有指定 `catch` 语句来捕获异常，则异常会在执行完 `finally` 语句后抛出。
+
+`finally` 语句会在任何匹配的 `catch` 语句后执行。
+
+你可以阅读 Dart 核心库概览的 [异常](https://dart.cn/guides/libraries/library-tour#exceptions) 章节获取更多相关信息。
+
+## 类
+
+Dart 是支持基于 mixin 继承机制的面向对象语言，所有对象都是一个类的实例，而除了 `Null` 以外的所有的类都继承自 [Object](https://api.dart.cn/stable/dart-core/Object-class.html) 类。 **基于 mixin 的继承** 意味着尽管每个类（[top class](https://dart.cn/null-safety/understanding-null-safety#top-and-bottom) `Object?` 除外）都只有一个超类，一个类的代码可以在其它多个类继承中重复使用。 [扩展方法](https://dart.cn/guides/language/language-tour#extension-methods) 是一种在不更改类或创建子类的情况下向类添加功能的方式。
+
+### 使用类的成员
+
+对象的 **成员** 由函数和数据（即 **方法** 和 **实例变量**）组成。方法的 **调用** 要通过对象来完成，这种方式可以访问对象的函数和数据。
+
+使用（`.`）来访问对象的实例变量或方法：
+
+使用 `?.` 代替 `.` 可以避免因为左边表达式为 null 而导致的问题。
+
+### 使用构造函数
+
+可以使用 **构造函数** 来创建一个对象。构造函数的命名方式可以为 `类名` 或 `类名 . 标识符` 的形式。
+
+构造函数名前面的的 `new` 关键字是可选的。
+
+一些类提供了[常量构造函数](https://dart.cn/guides/language/language-tour#constant-constructors)。使用常量构造函数，在构造函数名之前加 `const` 关键字，来创建编译时常量时。
+
+两个使用相同构造函数相同参数值构造的编译时常量是同一个对象：
+
+```dart
+var a = const ImmutablePoint(1, 1);
+var b = const ImmutablePoint(1, 1);
+
+assert(identical(a, b)); // They are the same instance!
+```
+
+在 **常量上下文** 场景中，你可以省略掉构造函数或字面量前的 `const` 关键字。
+
+### 获取对象的类型
+
+可以使用 `Object` 对象的 `runtimeType` 属性在运行时获取一个对象的类型，该对象类型是 [Type](https://api.dart.cn/stable/dart-core/Type-class.html) 的实例。
+
+> 使用 类型测试符 而不是 `runtimeType` 用来测试一个对象的类型。在生产环境中，测试 `object is Type` 要比 `object.runtimeType == Type` 稳定的多。
+
+### 实例变量
+
+所有未初始化的实例变量其值均为 `null` 。
+
+所有实例变量均会隐式地声明一个 *Getter* 方法。非终值的实例变量和 `late final` 声明但未声明初始化的实例变量还会隐式地声明一个 *Setter* 方法。你可以查阅 [Getter 和 Setter](https://dart.cn/guides/language/language-tour#getters-and-setters) 获取更多相关信息。
+
+实例变量可以是 `final` 的，它们只能被赋值一次，有几种方式：在声明处初始化 `final` 而非 `late` 的实例变量、使用构造器参数或使用构造器的 [初始化列表](https://dart.cn/guides/language/language-tour#initializer-list) 。
+
+如果你需要在构造器体之后对一个 `final` 的实例变量赋值，你可以使用以下几种方法：
+
+- 使用 工厂构造器 。
+
+- 使用 `late final` 但是要 [注意](https://dart.cn/guides/language/effective-dart/design#avoid-public-late-final-fields-without-initializers) ：`late final` 并没有初始化器添加 setter 方法到 API。
+
+### 构造函数
+
+声明一个与类名一样的函数即可声明一个构造函数（对于[命名式构造函数](https://dart.cn/guides/language/language-tour#named-constructors) 还可以添加额外的标识符）。大部分的构造函数形式是生成式构造函数，其用于创建一个类的实例。
+
+使用 `this` 关键字引用当前实例。
+
+#### 初始化参数
+
+对于大多数编程语言来说在构造函数中为实例变量赋值的过程都是类似的，而 Dart 则提供了一种特殊的语法糖来简化该步骤。
+
+构造中初始化的参数可以用于初始化非空或 `final` 修饰的变量，它们都必须被初始化或提供一个默认值。
+
+```dart
+class Point {
+  final double x;
+  final double y;
+
+  // Sets the x and y instance variables
+  // before the constructor body runs.
+  Point(this.x, this.y);
+}
+```
+
+#### 默认构造函数
+
+如果你没有声明构造函数，那么 Dart 会自动生成一个无参数的构造函数并且该构造函数会调用其父类的无参数构造方法。
+
+#### 构造函数不被继承
+
+子类不会继承父类的构造函数，如果子类没有声明构造函数，那么只会有一个默认无参数的构造函数。
+
+#### 命名式构造函数
+
+可以为一个类声明多个命名式构造函数来表达更明确的意图：
+
+```dart
+const double xOrigin = 0;
+const double yOrigin = 0;
+
+class Point {
+  final double x;
+  final double y;
+
+  Point(this.x, this.y);
+
+  // Named constructor
+  Point.origin()
+      : x = xOrigin,
+        y = yOrigin;
+}
+```
+
+记住构造函数是不能被继承的，这将意味着子类不能继承父类的命名式构造函数，如果你想在子类中提供一个与父类命名构造函数名字一样的命名构造函数，则需要在子类中显式地声明。
+
+调用父类非默认构造函数
+
+默认情况下，子类的构造函数会调用父类的匿名无参数构造方法，并且该调用会在子类构造函数的函数体代码执行前，如果子类构造函数还有一个 [初始化列表](https://dart.cn/guides/language/language-tour#initializer-list)，那么该初始化列表会在调用父类的该构造函数之前被执行，总的来说，这三者的调用顺序如下：
+
+1. 初始化列表
+
+1. 父类的无参数构造函数
+
+1. 当前类的构造函数
+
+如果父类没有匿名无参数构造函数，那么子类必须调用父类的其中一个构造函数，为子类的构造函数指定一个父类的构造函数只需在构造函数体前使用（`:`）指定。
+
+> 传递给父类构造函数的参数不能使用 `this` 关键字，因为在参数传递的这一步骤，子类构造函数尚未执行，子类的实例对象也就还未初始化，因此所有的实例成员都不能被访问，但是类成员可以。
+
+#### 初始化列表
+
+除了调用父类构造函数之外，还可以在构造函数体执行之前初始化实例变量。每个实例变量之间使用逗号分隔。
+
+```dart
+// Initializer list sets instance variables before
+// the constructor body runs.
+Point.fromJson(Map<String, double> json)
+    : x = json['x']!,
+      y = json['y']! {
+  print('In Point.fromJson(): ($x, $y)');
+}
+```
+
+> 初始化列表表达式 = 右边的语句不能使用 `this` 关键字。
+
+#### 重定向构造函数
+
+有时候类中的构造函数仅用于调用类中其它的构造函数，此时该构造函数没有函数体，只需在函数签名后使用（:）指定需要重定向到的其它构造函数 (使用 `this` 而非类名)：
+
+```dart
+class Point {
+  double x, y;
+
+  // The main constructor for this class.
+  Point(this.x, this.y);
+
+  // Delegates to the main constructor.
+  Point.alongXAxis(double x) : this(x, 0);
+}
+```
+
+#### 常量构造函数
+
+如果类生成的对象都是不变的，可以在生成这些对象时就将其变为编译时常量。你可以在类的构造函数前加上 `const` 关键字并确保所有实例变量均为 `final` 来实现该功能。
+
+```dart
+class ImmutablePoint {
+  static const ImmutablePoint origin = ImmutablePoint(0, 0);
+
+  final double x, y;
+
+  const ImmutablePoint(this.x, this.y);
+}
+```
+
+常量构造函数创建的实例并不总是常量，具体可以参考[使用构造函数](https://dart.cn/guides/language/language-tour#using-constructors)章节。
+
+#### 工厂构造函数
+
+使用 `factory` 关键字标识类的构造函数将会令该构造函数变为工厂构造函数，这将意味着使用该构造函数构造类的实例时**并非总是会返回新的实例对象**。例如，工厂构造函数可能会从缓存中返回一个实例，或者返回一个子类型的实例。
+
+> 另一种处理懒加载变量的方式是 [使用 late final（谨慎使用）](https://dart.cn/guides/language/effective-dart/design#avoid-public-late-final-fields-without-initializers)。
+
+在如下的示例中， `Logger` 的工厂构造函数从缓存中返回对象，和 `Logger.fromJson` 工厂构造函数从 JSON 对象中初始化一个最终变量。
+
+```dart
+class Logger {
+  final String name;
+  bool mute = false;
+
+  // _cache is library-private, thanks to
+  // the _ in front of its name.
+  static final Map<String, Logger> _cache = <String, Logger>{};
+
+  factory Logger(String name) {
+    return _cache.putIfAbsent(name, () => Logger._internal(name));
+  }
+
+  factory Logger.fromJson(Map<String, Object> json) {
+    return Logger(json['name'].toString());
+  }
+
+  Logger._internal(this.name);
+
+  void log(String msg) {
+    if (!mute) print(msg);
+  }
+}
+```
+
+> 在工厂构造函数中无法访问 `this`。
+
+工厂构造函数的调用方式与其他构造函数一样：
+
+```dart
+var logger = Logger('UI');
+logger.log('Button clicked');
+
+var logMap = {'name': 'UI'};
+var loggerJson = Logger.fromJson(logMap);
+```
