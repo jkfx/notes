@@ -766,3 +766,160 @@ logger.log('Button clicked');
 var logMap = {'name': 'UI'};
 var loggerJson = Logger.fromJson(logMap);
 ```
+
+### 方法
+
+为了表示重写操作符，使用 `operator` 标识来进行标记。下面是重写 `+` 和 `-` 操作符的例子
+
+```dart
+class Vector {
+  final int x, y;
+
+  Vector(this.x, this.y);
+
+  Vector operator +(Vector v) => Vector(x + v.x, y + v.y);
+  Vector operator -(Vector v) => Vector(x - v.x, y - v.y);
+
+  // Operator == and hashCode not shown.
+  // ···
+}
+
+void main() {
+  final v = Vector(2, 3);
+  final w = Vector(2, 2);
+
+  assert(v + w == Vector(4, 5));
+  assert(v - w == Vector(0, 1));
+}
+```
+
+#### Getter 和 Setter
+
+`Getter` 和 `Setter` 是一对用来读写对象属性的特殊方法，上面说过实例对象的每一个属性都有一个隐式的 Getter 方法，如果为非 final 属性的话还会有一个 Setter 方法，你可以使用 `get` 和 `set` 关键字为额外的属性添加 Getter 和 Setter 方法：
+
+```dart
+class Rectangle {
+  double left, top, width, height;
+
+  Rectangle(this.left, this.top, this.width, this.height);
+
+  // Define two calculated properties: right and bottom.
+  double get right => left + width;
+  set right(double value) => left = value - width;
+  double get bottom => top + height;
+  set bottom(double value) => top = value - height;
+}
+
+void main() {
+  var rect = Rectangle(3, 4, 20, 15);
+  assert(rect.left == 3);
+  rect.right = 12;
+  assert(rect.left == -8);
+}
+```
+
+#### 抽象方法
+
+实例方法、Getter 方法以及 Setter 方法都可以是抽象的，定义一个接口方法而不去做具体的实现让实现它的类去实现该方法，抽象方法只能存在于 [抽象类](https://dart.cn/guides/language/language-tour#abstract-classes)中。
+
+直接使用分号（`;`）替代方法体即可声明一个抽象方法：
+
+```dart
+abstract class Doer {
+  // Define instance variables and methods...
+
+  void doSomething(); // Define an abstract method.
+}
+
+class EffectiveDoer extends Doer {
+  void doSomething() {
+    // Provide an implementation, so the method is not abstract here...
+  }
+}
+```
+
+#### 隐式接口
+
+每一个类都隐式地定义了一个接口并实现了该接口，这个接口包含所有这个类的实例成员以及这个类所实现的其它接口。如果想要创建一个 A 类支持调用 B 类的 API 且不想继承 B 类，则可以实现 B 类的接口。
+
+一个类可以通过关键字 `implements` 来实现一个或多个接口并实现每个接口定义的 API：
+
+```dart
+// A person. The implicit interface contains greet().
+class Person {
+  // In the interface, but visible only in this library.
+  final String _name;
+
+  // Not in the interface, since this is a constructor.
+  Person(this._name);
+
+  // In the interface.
+  String greet(String who) => 'Hello, $who. I am $_name.';
+}
+
+// An implementation of the Person interface.
+class Impostor implements Person {
+  String get _name => '';
+
+  String greet(String who) => 'Hi $who. Do you know who I am?';
+}
+
+String greetBob(Person person) => person.greet('Bob');
+
+void main() {
+  print(greetBob(Person('Kathy')));
+  print(greetBob(Impostor()));
+}
+```
+
+如果需要实现多个类接口，可以使用逗号分割每个接口类：
+
+```dart
+class Point implements Comparable, Location {...}
+```
+
+#### 扩展一个类
+
+使用 `extends` 关键字来创建一个子类，并可使用 `super` 关键字引用一个父类。
+
+##### 重写类成员
+
+子类可以重写父类的实例方法（包括 [操作符](https://dart.cn/guides/language/language-tour#_operators)）、 Getter 以及 Setter 方法。你可以使用 `@override` 注解来表示你重写了一个成员。
+
+一个重写方法的声明必须在几个方面与它所覆盖的方法相匹配。
+
+- 返回类型必须与被覆盖方法的返回类型相同（或为其子类型）。
+
+- 参数类型必须与被覆盖方法的参数类型相同（或者是超类型）。
+
+- 如果被覆盖的方法接受n个位置参数，那么被覆盖的方法也必须接受n个位置参数。
+
+- 一个[泛型方法](https://dart.cn/guides/language/language-tour#using-generic-methods)不能覆盖一个非泛型方法，而一个非泛型方法也不能覆盖一个泛型方法。
+
+你可以使用 `covariant` 关键字 来缩小代码中那些符合 [类型安全](https://dart.cn/guides/language/type-system) 的方法参数或实例变量的类型。
+
+> 如果重写 `==` 操作符，必须同时重写对象 `hashCode` 的 Getter 方法。你可以查阅 [实现映射键](https://dart.cn/guides/libraries/library-tour#implementing-map-keys) 获取更多关于重写的 `==` 和 `hashCode` 的例子。
+
+#### noSuchMethod 方法
+
+如果调用了对象上不存在的方法或实例变量将会触发 `noSuchMethod` 方法，你可以重写 `noSuchMethod` 方法来追踪和记录这一行为：
+
+```dart
+class A {
+  // Unless you override noSuchMethod, using a
+  // non-existent member results in a NoSuchMethodError.
+  @override
+  void noSuchMethod(Invocation invocation) {
+    print('You tried to use a non-existent member: '
+        '${invocation.memberName}');
+  }
+}
+```
+
+只有下面其中一个条件成立时，你才能调用一个未实现的方法：
+
+- 接收方是静态的 `dynamic` 类型。
+
+- 接收方具有静态类型，定义了未实现的方法（抽象亦可），并且接收方的动态类型实现了 `noSuchMethod` 方法且具体的实现与 `Object` 中的不同。
+
+你可以查阅 [noSuchMethod 转发规范](https://github.com/dart-lang/sdk/blob/master/docs/language/informal/nosuchmethod-forwarding.md) 获取更多相关信息。
