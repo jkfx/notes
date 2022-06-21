@@ -283,3 +283,105 @@ Baseline(
 ![image](https://tva3.sinaimg.cn/large/006VTcCxly1h3fzond2t6j314y0mkn3d.jpg)
 
 ---
+
+## get_it
+
+在应用运行之前注册一个应用程序运行之后会需要用到的类：
+
+```dart
+GetIt.I.registerSingleton<MyDatabase>(
+    MyDatabase(),
+);
+```
+
+当需要时取回：
+
+```dart
+final MyDatabase db = GetIt.I.get<MyDatabase>();
+```
+
+如果不需要在注册时就初始化类，就使用懒式初始化：
+
+```dart
+GetIt.I.registerFactory<MyBloc>(
+    () => MyBloc(),
+);
+
+final myBloc = GetIt.I.get<MyBloc>();
+```
+
+当只有大多数东西都是 widget 时，尝试 get_it 来定位那些不是的东西。
+
+---
+
+## path_provider
+
+使用 path_provider 来访问设备的文件系统。
+
+加载用户的文档目录：
+
+```dart
+Directory appDocDir = await
+getApplicationDocumentsDirectory();
+```
+
+或者加载应用数据的支持目录：
+
+```dart
+Directory appSupportDir = await
+getApplicationSupportDirectory();
+```
+
+也可以加载一个临时文件夹存放不超过当前会话的数据：
+
+```dart
+Directory appTempDir = await
+getTemporaryDirectory();
+```
+
+---
+
+## Freezed
+
+使用之前添加如下内容到 `pubspec.yaml` 文件中：
+
+```yaml
+dependencies:
+  freezed_annotation: any
+
+dev_dependencies:
+  build_runner: any
+  freezed: any
+  json_serializable: any
+```
+
+- 先用 `@Freezed()` 注解修饰一个类，指定将其纳入的超类
+- 使用工厂构造器
+- 在构造器中指定数据类所需字段
+- 还可以使用 `@Default` 装饰器来分配默认值
+- 加个 FromJson 构造函数
+- 在文件顶部加入 `part` 的声明
+
+```dart
+part 'my_class.freezed.dart';
+part 'my_class.g.dart';
+
+@Freezed()
+class MyClass with _$MyClas {
+    const factory MyClass({
+        required int id,
+        @Default(true) bool isImportant,
+    });
+
+    factory MyClass.fromJson(Map<String, dynamic> json)
+        => _$MyClassFromJson(json);
+}
+```
+
+最后执行：
+
+```sh
+flutter pub build_runner build --delete-conflicting-outputs
+```
+
+---
