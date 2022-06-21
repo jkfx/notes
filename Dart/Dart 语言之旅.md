@@ -923,3 +923,466 @@ class A {
 - 接收方具有静态类型，定义了未实现的方法（抽象亦可），并且接收方的动态类型实现了 `noSuchMethod` 方法且具体的实现与 `Object` 中的不同。
 
 你可以查阅 [noSuchMethod 转发规范](https://github.com/dart-lang/sdk/blob/master/docs/language/informal/nosuchmethod-forwarding.md) 获取更多相关信息。
+
+### 扩展方法
+
+扩展方法是向现有库添加功能的一种方式。你可能已经在不知道它是扩展方法的情况下使用了它。例如，当您在 IDE 中使用代码完成功能时，它建议将扩展方法与常规方法一起使用。
+
+有关使用以及实现扩展方法的详细信息，请参阅 [扩展方法页面](https://dart.cn/guides/language/extension-methods)。
+
+### 枚举类型
+
+枚举类型是一种特殊的类型，也称为 **enumerations** 或 **enums**，用于定义一些固定数量的常量值。
+
+#### 使用枚举
+
+使用关键字 `enum` 来定义枚举类型：
+
+```dart
+enum Color { red, green, blue }
+```
+
+你可以在声明枚举类型时使用 [尾随逗号](https://dart.cn/guides/language/language-tour#trailing-comma)。
+
+每一个枚举值都有一个名为 `index` 成员变量的 Getter 方法，该方法将会返回以 0 为基准索引的位置值。
+
+```dart
+assert(Color.red.index == 0);
+assert(Color.green.index == 1);
+assert(Color.blue.index == 2);
+```
+
+想要获得全部的枚举值，使用枚举类的 `values` 方法获取包含它们的列表：
+
+```dart
+List<Color> colors = Color.values;
+assert(colors[2] == Color.blue);
+```
+
+你可以在 `switch` 语句中使用枚举，但是需要注意的是必须处理枚举值的每一种情况，即每一个枚举值都必须成为一个 `case` 子句，不然会出现警告。
+
+枚举类型有如下两个限制：
+
+- 枚举不能成为子类，也不可以 mix in，你也不可以实现一个枚举。
+
+- 不能显式地实例化一个枚举类。
+
+### 使用 Mixin 为类添加功能
+
+Mixin 是一种在多重继承中复用某个类中代码的方法模式。
+
+使用 `with` 关键字并在其后跟上 Mixin 类的名字来使用 Mixin 模式：
+
+```dart
+class Musician extends Performer with Musical {
+  // ···
+}
+
+class Maestro extends Person with Musical, Aggressive, Demented {
+  Maestro(String maestroName) {
+    name = maestroName;
+    canConduct = true;
+  }
+}
+```
+
+想要实现一个 Mixin，请创建一个继承自 Object 且未声明构造函数的类。除非你想让该类与普通的类一样可以被正常地使用，否则请使用关键字 `mixin` 替代 `class`。
+
+```dart
+mixin Musical {
+  bool canPlayPiano = false;
+  bool canCompose = false;
+  bool canConduct = false;
+
+  void entertainMe() {
+    if (canPlayPiano) {
+      print('Playing piano');
+    } else if (canConduct) {
+      print('Waving hands');
+    } else {
+      print('Humming to self');
+    }
+  }
+}
+```
+
+可以使用关键字 `on` 来指定哪些类可以使用该 Mixin 类，比如有 Mixin 类 A，但是 A 只能被 B 类使用，则可以这样定义 A :
+
+```dart
+class Musician {
+  // ...
+}
+mixin MusicalPerformer on Musician {
+  // ...
+}
+class SingerDancer extends Musician with MusicalPerformer {
+  // ...
+}
+```
+
+### 类变量和方法
+
+使用关键字 `static` 可以声明类变量或类方法。
+
+#### 静态变量
+
+静态变量（即类变量）常用于声明类范围内所属的状态变量和常量。
+
+静态变量在其首次被使用的时候才被初始化。
+
+#### 静态方法
+
+静态方法（即类方法）不能对实例进行操作，因此不能使用 `this`。但是他们可以访问静态变量。
+
+> 对于一些通用或常用的静态方法，应该将其定义为顶级函数而非静态方法。
+
+可以将静态方法作为编译时常量。例如，你可以将静态方法作为一个参数传递给一个常量构造函数。
+
+## 泛型
+
+`<…>` 符号表示数组是一个 *泛型*（或 *参数化类型*） [通常](https://dart.cn/guides/language/effective-dart/design#do-follow-existing-mnemonic-conventions-when-naming-type-parameters) 使用一个字母来代表类型参数，比如 E、T、S、K 和 V 等等。
+
+### 为什么使用泛型？
+
+泛型常用于需要要求类型安全的情况，但是它也会对代码运行有好处：
+
+- 适当地指定泛型可以更好地帮助代码生成。
+
+- 使用泛型可以减少代码重复。
+
+### 使用集合字面量
+
+List、Set 以及 Map 字面量也可以是参数化的。定义参数化的 List 只需在中括号前添加 `<type>`；定义参数化的 Map 只需要在大括号前添加 `<keyType, valueType>`
+
+```dart
+var names = <String>['Seth', 'Kathy', 'Lars'];
+var uniqueNames = <String>{'Seth', 'Kathy', 'Lars'};
+var pages = <String, String>{
+  'index.html': 'Homepage',
+  'robots.txt': 'Hints for web robots',
+  'humans.txt': 'We are people, not machines'
+};
+```
+
+### 使用类型参数化的构造函数
+
+在调用构造方法时也可以使用泛型，只需在类名后用尖括号（`<...>`）将一个或多个类型包裹即可：
+
+```dart
+var nameSet = Set<String>.from(names);
+```
+
+### 泛型集合以及它们所包含的类型
+
+Dart的泛型类型是 **固化的**，这意味着即便在运行时也会保持类型信息：
+
+```dart
+var names = <String>[];
+names.addAll(['Seth', 'Kathy', 'Lars']);
+print(names is List<String>); // true
+```
+
+> 与 Java 不同的是，Java 中的泛型是类型 **擦除** 的，这意味着泛型类型会在运行时被移除。在 Java 中你可以判断对象是否为 List 但不可以判断对象是否为 `List<String>`。
+
+### 限制参数化类型
+
+有时使用泛型的时候，你可能会想限制可作为参数的泛型范围，也就是参数必须是指定类型的子类，这时候可以使用 `extends` 关键字。
+
+```dart
+class Foo<T extends SomeBaseClass> {
+  // Implementation goes here...
+  String toString() => "Instance of 'Foo<$T>'";
+}
+
+class Extender extends SomeBaseClass {...}
+
+var foo = Foo();
+print(foo); // Instance of 'Foo<SomeBaseClass>'
+```
+
+### 使用泛型方法
+
+起初 Dart 只支持在类的声明时指定泛型，现在同样也可以在方法上使用泛型，称之为 **泛型方法**：
+
+```dart
+T first<T>(List<T> ts) {
+  // Do some initial work or error checking, then...
+  T tmp = ts[0];
+  // Do some additional checking or processing...
+  return tmp;
+}
+```
+
+你可以查阅 [使用泛型函数](https://github.com/dart-lang/sdk/blob/master/pkg/dev_compiler/doc/GENERIC_METHODS.md) 获取更多关于泛型的信息。
+
+## 库和可见性
+
+`import` 和 `library` 关键字可以帮助你创建一个模块化和可共享的代码库。代码库不仅只是提供 API 而且还起到了封装的作用：以下划线（`_`）开头的成员仅在代码库中可见。 **每个 Dart 程序都是一个库**，即便没有使用关键字 `library` 指定。
+
+Dart 的库可以使用 [包工具](https://dart.cn/guides/packages) 来发布和部署。
+
+### 使用库
+
+使用 `import` 来指定命名空间以便其它库可以访问。
+
+`import` 的唯一参数是用于指定代码库的 URI，对于 Dart 内置的库，使用 `dart:xxxxxx` 的形式。而对于其它的库，你可以使用一个文件系统路径或者以 `package:xxxxxx` 的形式。 `package:xxxxxx` 指定的库通过包管理器（比如 pub 工具）来提供
+
+> **URI** 代表统一资源标识符。
+> 
+> **URL**（统一资源定位符）是一种常见的 URI。
+
+#### 指定库前缀
+
+如果你导入的两个代码库有冲突的标识符，你可以为其中一个指定前缀。
+
+```dart
+import 'package:lib1/lib1.dart';
+import 'package:lib2/lib2.dart' as lib2;
+
+// Uses Element from lib1.
+Element element1 = Element();
+
+// Uses Element from lib2.
+lib2.Element element2 = lib2.Element();
+```
+
+#### 导入库的一部分
+
+如果你只想使用代码库中的一部分，你可以有选择地导入代码库。
+
+```dart
+// Import only foo.
+import 'package:lib1/lib1.dart' show foo;
+
+// Import all names EXCEPT foo.
+import 'package:lib2/lib2.dart' hide foo;
+```
+
+#### 延迟加载库
+
+延迟加载（也常称为 懒加载）允许应用在需要时再去加载代码库。
+
+> **目前只有 dart2js 支持延迟加载** Flutter、Dart VM 以及 DartDevc 目前都不支持延迟加载。
+
+使用 `deferred as` 关键字来标识需要延时加载的代码库。
+
+### 实现库
+
+查阅 [创建依赖库包](https://dart.cn/guides/libraries/create-library-packages) 可以获取有关如何实现库包的建议，包括：
+
+- 如何组织库的源文件。
+
+- 如何使用 `export` 命令。
+
+- 何时使用 `part` 命令。
+
+- 何时使用 `library` 命令。
+
+- 如何使用导入和导出命令实现多平台的库支持。
+
+## 异步支持
+
+Dart 代码库中有大量返回 [Future](https://api.dart.cn/stable/dart-async/Future-class.html) 或 [Stream](https://api.dart.cn/stable/dart-async/Stream-class.html) 对象的函数，这些函数都是 **异步** 的，它们会在耗时操作（比如I/O）执行完毕前直接返回而不会等待耗时操作执行完毕。
+
+`async` 和 `await` 关键字用于实现异步编程，并且让你的代码看起来就像是同步的一样。
+
+### 处理 Future
+
+可以通过下面两种方式，获得 Future 执行完成的结果：
+
+- 使用 `async` 和 `await`，在 [异步编程 codelab](https://dart.cn/codelabs/async-await) 中有更多描述；
+
+- 使用 Future API，具体描述参考 [库概览](https://dart.cn/guides/libraries/library-tour#future)。
+
+使用 `async` 和 `await` 的代码是异步的，但是看起来有点像同步代码。
+
+必须在带有 `async` 关键字的 **异步函数** 中使用 `await`。
+
+```dart
+Future<void> checkVersion() async {
+  var version = await lookUpVersion();
+  // Do something with version
+}
+```
+
+> 尽管异步函数可以处理耗时操作，但是它并不会等待这些耗时操作完成，异步函数执行时会在其遇到第一个 `await` 表达式（[代码行](https://github.com/dart-lang/sdk/blob/main/docs/newsletter/20170915.md#synchronous-async-start)）时返回一个 Future 对象，然后等待 await 表达式执行完毕后继续执行。
+
+使用 `try` 、 `catch` 以及 `finally` 来处理使用 `await` 导致的异常：
+
+```dart
+try {
+  version = await lookUpVersion();
+} catch (e) {
+  // React to inability to look up the version
+}
+```
+
+你可以在异步函数中多次使用 await 关键字。
+
+> `await` 表达式的返回值通常是一个 Future 对象；如果不是的话也会自动将其包裹在一个 Future 对象里。 Future 对象代表一个“承诺”， `await` 表达式会阻塞直到需要的对象返回。
+
+如果在使用 `await` 时导致编译错误，请确保 `await` 在一个异步函数中使用。
+
+#### 声明异步函数
+
+**异步函数** 是函数体由 `async` 关键字标记的函数。
+
+将关键字 `async` 添加到函数并让其返回一个 Future 对象。
+
+如果函数没有返回有效值，需要设置其返回类型为 `Future<void>`。
+
+### 处理 Stream
+
+如果想从 Stream 中获取值，可以有两种选择：
+
+- 使用 `async` 关键字和一个 **异步循环**（使用 `await for` 关键字标识）。
+
+- 使用 Stream API。详情参考 [库概览](https://dart.cn/guides/libraries/library-tour#stream)。
+
+使用 `await for` 定义异步循环看起来是这样的：
+
+```dart
+await for (varOrType identifier in expression) {
+  // Executes each time the stream emits a value.
+}
+```
+
+`expression` 的类型必须是 Stream。执行流程如下：
+
+1. 等待直到 Stream 返回一个数据。
+
+1. 使用 1 中 Stream 返回的数据执行循环体。
+
+1. 重复 1、2 过程直到 Stream 数据返回完毕。
+
+使用 `break` 和 `return` 语句可以停止接收 Stream 数据，这样就跳出了循环并取消注册监听 Stream。
+
+如果在实现异步 for 循环时遇到编译时错误，请检查确保 `await for` 处于异步函数中。
+
+你可以查阅库概览中有关 `dart:async` 的部分获取更多有关异步编程的信息。
+
+## 生成器
+
+当你需要延迟地生成一连串的值时，可以考虑使用 *生成器函数*。Dart 内置支持两种形式的生成器方法：
+
+- **同步** 生成器：返回一个 [Iterable](https://api.dart.cn/stable/dart-core/Iterable-class.html) 对象。
+
+- **异步** 生成器：返回一个 [Stream](https://api.dart.cn/stable/dart-async/Stream-class.html) 对象。
+
+通过在函数上加 `sync*` 关键字并将返回值类型设置为 Iterable 来实现一个 **同步** 生成器函数，在函数中使用 `yield` 语句来传递值：
+
+```dart
+Iterable<int> naturalsTo(int n) sync* {
+  int k = 0;
+  while (k < n) yield k++;
+}
+```
+
+实现 **异步** 生成器函数与同步类似，只不过关键字为 `async*` 并且返回值为 Stream：
+
+```dart
+Stream<int> asynchronousNaturalsTo(int n) async* {
+  int k = 0;
+  while (k < n) yield k++;
+}
+```
+
+如果生成器是递归调用的，可以使用 `yield*` 语句提升执行性能：
+
+```dart
+Iterable<int> naturalsDownFrom(int n) sync* {
+  if (n > 0) {
+    yield n;
+    yield* naturalsDownFrom(n - 1);
+  }
+}
+```
+
+## 可调用类
+
+通过实现类的 `call()` 方法，允许使用类似函数调用的方式来使用该类的实例。
+
+## 隔离区
+
+大多数计算机中，甚至在移动平台上，都在使用多核 CPU。为了有效利用多核性能，开发者一般使用共享内存的方式让线程并发地运行。然而，多线程共享数据通常会导致很多潜在的问题，并导致代码运行出错。
+
+为了解决多线程带来的并发问题，Dart 使用 isolate 替代线程，所有的 Dart 代码均运行在一个 **isolate** 中。每一个 isolate 有它自己的堆内存以确保其状态不被其它 isolate 访问。
+
+所有的 Dart 代码都是在一个 isolate 中运行，而非线程。每个 isolate 都有一个单独的执行线程，并且不与其他的 isolate 共享任何可变对象。
+
+## Typedef
+
+类型别名是引用某一类型的简便方法，因为其使用关键字 `typedef`，因此通常被称作 **typedef**。
+
+```dart
+typedef IntList = List<int>;
+IntList il = [1, 2, 3];
+```
+
+类型别名可以有类型参数:
+
+```dart
+typedef ListMapper<X> = Map<X, List<X>>;
+Map<String, List<String>> m1 = {}; // Verbose.
+ListMapper<String> m2 = {}; // Same thing but shorter and clearer.
+```
+
+## 元数据
+
+使用元数据可以为代码增加一些额外的信息。元数据注解以 `@` 开头，其后紧跟一个编译时常量（比如 `deprecated`）或者调用一个常量构造函数。
+
+Dart 中有两个注解是所有代码都可以使用的： `@deprecated`、`@Deprecated` 和 `@override`。你可以查阅 [扩展一个类](https://dart.cn/guides/language/language-tour#extending-a-class) 获取有关 `@override` 的使用示例。
+
+可以自定义元数据注解。下面的示例定义了一个带有两个参数的 @todo 注解：
+
+```dart
+library todo;
+
+class Todo {
+  final String who;
+  final String what;
+
+  const Todo(this.who, this.what);
+}
+```
+
+使用 @Todo 注解的示例：
+
+```dart
+import 'todo.dart';
+
+@Todo('seth', 'make this do something')
+void doSomething() {
+  print('do something');
+}
+```
+
+元数据可以在 library、class、typedef、type parameter、 constructor、factory、function、field、parameter 或者 variable 声明之前使用，也可以在 import 或 export 之前使用。可使用反射在运行时获取元数据信息。
+
+## 注释
+
+Dart 支持单行注释、多行注释和文档注释。
+
+### 单行注释
+
+单行注释以 `//` 开始。所有在 `//` 和该行结尾之间的内容均被编译器忽略。
+
+### 多行注释
+
+多行注释以 `/*` 开始，以 `*/` 结尾。所有在 `/*` 和 `*/` 之间的内容均被编译器忽略（不会忽略文档注释），多行注释可以嵌套。
+
+### 文档注释
+
+文档注释可以是多行注释，也可以是单行注释，文档注释以 `///` 或者 `/**` 开始。在连续行上使用 `///` 与多行文档注释具有相同的效果。
+
+在文档注释中，除非用中括号括起来，否则分析器会忽略所有文本。使用中括号可以引用类、方法、字段、顶级变量、函数和参数。括号中的符号会在已记录的程序元素的词法域中进行解析。
+
+在生成的文档中，`[feed]` 会成为一个链接，指向 `feed` 方法的文档， `[Food]` 会成为一个链接，指向 `Food` 类的 API 文档。
+
+解析 Dart 代码并生成 HTML 文档，可以使用 Dart 的文档生成工具 [dart doc](https://dart.cn/tools/dartdoc)。
+
+## 总结
+
+本页概述了 Dart 语言中常用的功能。还有更多特性有待实现，但我们希望它们不会破坏现有代码。有关更多信息，请参考 [Dart 语言规范](https://dart.cn/guides/language/spec) 和 [高效 Dart 语言指南](https://dart.cn/guides/language/effective-dart)。
+
+要了解更多关于 Dart 核心库的内容，请参考 [Dart 核心库概览](https://dart.cn/guides/libraries/library-tour)。
